@@ -14,12 +14,13 @@
 	let isButton2Pressed = false;
 	let isButton4Pressed = false;
 	let isButton5Pressed = false;
+	let isButton9Pressed = false;
 
-	// setInterval(() => {
-	// 	if (window.desiredGSC) {
-	// 		window.gsc = window.desiredGSC;
-	// 	}
-	// }, 100);
+	setInterval(() => {
+		if (window.desiredGSC) {
+			window.gsc = window.desiredGSC;
+		}
+	}, 100);
 
 	const updateGamepad = () => {
 		const gamepads = navigator.getGamepads();
@@ -43,7 +44,7 @@
 				const canvas = document.querySelector("canvas.nsi");
 				if (canvas) {
 					const rect = canvas.getBoundingClientRect();
-					const hoverDistance = Math.min(canvas.width, canvas.height) * 0.45; // canvasの大きさの90%の半径
+					const hoverDistance = Math.min(canvas.width, canvas.height) * 0.4; // canvasの大きさの90%の半径
 					const x =
 						rect.left + canvas.width / 2 + hoverDistance * Math.cos(angle);
 					const y =
@@ -57,6 +58,15 @@
 						clientY: y,
 					});
 					canvas.dispatchEvent(event);
+
+					// 座標を赤い半透明の丸で表示
+					const ctx = canvas.getContext("2d");
+					ctx.save(); // canvasの状態を保存
+					ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
+					ctx.beginPath();
+					ctx.arc(x, y, 5, 0, Math.PI * 2);
+					ctx.fill();
+					ctx.restore(); // canvasの状態を復元
 				}
 			}
 
@@ -85,6 +95,8 @@
 				const canvas = document.querySelector("canvas.nsi");
 				if (canvas) {
 					const rect = canvas.getBoundingClientRect();
+					console.log(canvas.width, canvas.height);
+
 					const x = rect.left + canvas.width / 2;
 					const y = rect.top + canvas.height / 2;
 
@@ -106,18 +118,30 @@
 			const isButton5PressedNow = gamepad.buttons[5].pressed;
 
 			if (isButton4PressedNow && !isButton4Pressed) {
-				// window.desiredGSC = window.gsc * 0.9;
-				// window.gsc = window.desiredGSC;
+				window.desiredGSC = window.gsc * 0.9;
+				window.gsc = window.desiredGSC;
 			}
 
 			if (isButton5PressedNow && !isButton5Pressed) {
-				// window.desiredGSC = window.gsc * 1.11;
-				// window.gsc = window.desiredGSC;
+				window.desiredGSC = window.gsc * 1.11;
+				window.gsc = window.desiredGSC;
 			}
 
 			isButton4Pressed = isButton4PressedNow;
 			isButton5Pressed = isButton5PressedNow;
+
+			// button9を押すとゲームスタートボタンを押した扱いとする
+			const isButton9PressedNow = gamepad.buttons[9].pressed;
+
+			if (isButton9PressedNow && !isButton9Pressed) {
+				const b = document.querySelector("#playh > div > div > div.sadu1");
+				console.log(b);
+				b.click();
+			}
+
+			isButton9Pressed = isButton9PressedNow;
 		}
+
 		requestAnimationFrame(updateGamepad);
 	};
 
