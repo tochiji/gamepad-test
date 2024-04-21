@@ -32,6 +32,12 @@
 				continue;
 			}
 
+			// widthとheightはhtmlのプロパティから撮る
+			const html = document.querySelector("html");
+			const rect = html.getBoundingClientRect();
+			const width = rect.width;
+			const height = rect.height;
+
 			// 左スティックの入力を取得
 			const leftStickX = gamepad.axes[0];
 			const leftStickY = gamepad.axes[1];
@@ -43,12 +49,9 @@
 				// スティックの方向に基づいてcanvas内の特定の位置をホバー
 				const canvas = document.querySelector("canvas.nsi");
 				if (canvas) {
-					const rect = canvas.getBoundingClientRect();
-					const hoverDistance = Math.min(canvas.width, canvas.height) * 0.4; // canvasの大きさの90%の半径
-					const x =
-						rect.left + canvas.width / 2 + hoverDistance * Math.cos(angle);
-					const y =
-						rect.top + canvas.height / 2 + hoverDistance * Math.sin(angle);
+					const hoverDistance = Math.min(width, height) * 0.4; // canvasの大きさの90%の半径
+					const x = rect.left + width / 2 + hoverDistance * Math.cos(angle);
+					const y = rect.top + height / 2 + hoverDistance * Math.sin(angle);
 
 					const event = new MouseEvent("mousemove", {
 						view: window,
@@ -60,11 +63,22 @@
 					canvas.dispatchEvent(event);
 
 					// 座標を赤い半透明の丸で表示
+					const canvasHoverDistance =
+						Math.min(canvas.width, canvas.height) * 0.4; // canvasの大きさの90%の半径
+					const redPointX =
+						rect.left +
+						canvas.width / 2 +
+						canvasHoverDistance * Math.cos(angle);
+					const redPointY =
+						rect.top +
+						canvas.height / 2 +
+						canvasHoverDistance * Math.sin(angle);
+
 					const ctx = canvas.getContext("2d");
 					ctx.save(); // canvasの状態を保存
 					ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
 					ctx.beginPath();
-					ctx.arc(x, y, 5, 0, Math.PI * 2);
+					ctx.arc(redPointX, redPointY, 5, 0, Math.PI * 2);
 					ctx.fill();
 					ctx.restore(); // canvasの状態を復元
 				}
@@ -78,8 +92,8 @@
 				const canvas = document.querySelector("canvas.nsi");
 				if (canvas) {
 					const rect = canvas.getBoundingClientRect();
-					const x = rect.left + canvas.width / 2;
-					const y = rect.top + canvas.height / 2;
+					const x = rect.left + width / 2;
+					const y = rect.top + height / 2;
 
 					const downEvent = new MouseEvent("mousedown", {
 						view: window,
@@ -94,11 +108,8 @@
 				// ボタンが離された瞬間の処理
 				const canvas = document.querySelector("canvas.nsi");
 				if (canvas) {
-					const rect = canvas.getBoundingClientRect();
-					console.log(canvas.width, canvas.height);
-
-					const x = rect.left + canvas.width / 2;
-					const y = rect.top + canvas.height / 2;
+					const x = rect.left + width / 2;
+					const y = rect.top + height / 2;
 
 					const upEvent = new MouseEvent("mouseup", {
 						view: window,
